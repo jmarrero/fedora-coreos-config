@@ -9,6 +9,7 @@ include:
   - system-configuration.yaml
   - user-experience.yaml
   - shared-workarounds.yaml
+  - layering-microdnf.yaml
 
 initramfs-args:
   - --no-hostonly

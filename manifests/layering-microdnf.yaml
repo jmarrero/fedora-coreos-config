@@ -1,0 +1,13 @@
+# These packages are needed for installing packages thru microdnf
+# Currently, this is planned for use on the layering enhancement
+packages:
+ # microdnf
+ - libdnf dnf-data gobject-introspection microdnf
+postprocess:
+  # Move microdnf so it is clear that it should not be used on host systems,
+  # it is intended just for containers. This was proposed here: 
+  # https://github.com/coreos/fedora-coreos-tracker/issues/1050#issuecomment-996174981
+  - |
+    #!/usr/bin/env bash
+    mkdir /usr/lib/rpm-ostree/
+    mv /usr/bin/microdnf /usr/lib/rpm-ostree/
