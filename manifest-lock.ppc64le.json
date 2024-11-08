@@ -162,6 +162,12 @@
         "sourcerpm": "bind"
       }
     },
+    "bootc": {
+      "evra": "1.1.0-2.fc41.ppc64le",
+      "metadata": {
+        "sourcerpm": "bootc"
+      }
+    },
     "bootupd": {
       "evra": "0.2.24-1.fc41.ppc64le",
       "metadata": {
@@ -1489,7 +1495,7 @@
       }
     },
     "librepo": {
-      "evra": "1.18.1-1.fc41.ppc64le",
+      "evra": "1.19.0-1.fc41.ppc64le",
       "metadata": {
         "sourcerpm": "librepo"
       }
@@ -2600,7 +2606,7 @@
     }
   },
   "metadata": {
-    "generated": "2024-11-07T00:00:00Z",
+    "generated": "2024-11-08T00:00:00Z",
     "rpmmd_repos": {
       "fedora": {
         "generated": "2024-10-24T13:55:58Z"
@@ -2609,7 +2615,7 @@
         "generated": "2024-11-07T18:29:52Z"
       },
       "fedora-updates": {
-        "generated": "2024-11-07T02:11:10Z"
+        "generated": "2024-11-08T03:16:14Z"
       }
     }
   }
