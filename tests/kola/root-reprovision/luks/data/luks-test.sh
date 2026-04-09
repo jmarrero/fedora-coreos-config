@@ -57,6 +57,41 @@ case "${AUTOPKGTEST_REBOOT_MARK:-}" in
       # while we're here, sanity-check that we have a boot=UUID karg too
       grep boot=UUID= /proc/cmdline
       ok "found boot karg"
+
+      # Test bare soft-reboot on LUKS. This validates that
+      # DefaultDependencies=no on var.mount and the sysroot.mount drop-in
+      # work correctly when the root filesystem is on a LUKS device.
+      # See https://github.com/ostreedev/ostree/pull/3571
+      echo "Testing bare soft-reboot on LUKS root..."
+      /tmp/autopkgtest-soft-reboot-prepare "soft-rebooted"
+      systemctl soft-reboot
+      ;;
+
+  soft-rebooted)
+      # After soft-reboot on LUKS, verify critical mounts survived
+      echo "Verifying post-soft-reboot state on LUKS..."
+
+      # /var must be mounted and writable
+      mountpoint /var
+      touch /var/tmp/soft-reboot-luks-test && rm /var/tmp/soft-reboot-luks-test
+      ok "/var mounted and writable after soft-reboot"
+
+      # /sysroot must still be mounted
+      mountpoint /sysroot
+      ok "/sysroot mounted after soft-reboot"
+
+      # /boot must still be mounted
+      mountpoint /boot
+      ok "/boot mounted after soft-reboot"
+
+      # Root should still be on LUKS
+      srcdev=$(findmnt -nvr /sysroot -o SOURCE)
+      [[ ${srcdev} == /dev/mapper/myluksdev ]]
+      ok "root still on LUKS after soft-reboot"
+
+      # ostree commands should work
+      ostree admin status
+      ok "ostree admin status works after soft-reboot"
       ;;
   *) fatal "unexpected mark: ${AUTOPKGTEST_REBOOT_MARK}";;
 esac

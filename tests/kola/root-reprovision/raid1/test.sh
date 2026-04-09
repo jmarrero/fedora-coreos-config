@@ -54,6 +54,41 @@ case "${AUTOPKGTEST_REBOOT_MARK:-}" in
       grep root=UUID= /proc/cmdline
       grep rd.md.uuid= /proc/cmdline
       ok "found root kargs"
+
+      # Test bare soft-reboot on RAID1. This validates that
+      # DefaultDependencies=no on var.mount and the sysroot.mount drop-in
+      # work correctly when the root filesystem is on an mdraid device.
+      # See https://github.com/ostreedev/ostree/pull/3571
+      echo "Testing bare soft-reboot on RAID1 root..."
+      /tmp/autopkgtest-soft-reboot-prepare "soft-rebooted"
+      systemctl soft-reboot
+      ;;
+
+  soft-rebooted)
+      # After soft-reboot on RAID1, verify critical mounts survived
+      echo "Verifying post-soft-reboot state on RAID1..."
+
+      # /var must be mounted and writable
+      mountpoint /var
+      touch /var/tmp/soft-reboot-raid-test && rm /var/tmp/soft-reboot-raid-test
+      ok "/var mounted and writable after soft-reboot"
+
+      # /sysroot must still be mounted
+      mountpoint /sysroot
+      ok "/sysroot mounted after soft-reboot"
+
+      # /boot must still be mounted
+      mountpoint /boot
+      ok "/boot mounted after soft-reboot"
+
+      # Root should still be on RAID1
+      srcdev=$(findmnt -nvr /sysroot -o SOURCE)
+      [[ ${srcdev} == $(realpath /dev/md/foobar) ]]
+      ok "root still on RAID1 after soft-reboot"
+
+      # ostree commands should work
+      ostree admin status
+      ok "ostree admin status works after soft-reboot"
       ;;
   *) fatal "unexpected mark: ${AUTOPKGTEST_REBOOT_MARK}";;
 esac
